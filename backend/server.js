@@ -15,7 +15,7 @@ dotenv.config({ path: 'backend/config/config.env' });
 connectDatabase();
 
 const server = app.listen(process.env.PORT, () => {
-  console.log(`Server in wordking on http://localhost:${process.env.PORT}`);
+  console.log(`Server in working on http://localhost:${process.env.PORT}`);
 });
 // unhandled promise rejection / shutdown server
 process.on('unhandledRejection', (err) => {
