@@ -1,7 +1,7 @@
-const Product = require('../models/productModel');
-const ErrorHandler = require('../utils/errorhandler');
-const catchAsyncErrors = require('../middleware/catchAsyncErrors');
-const ApiFeatures = require('../utils/apifeatures');
+const Product = require("../models/productModel");
+const ErrorHandler = require("../utils/errorhandler");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const ApiFeatures = require("../utils/apifeatures");
 // create product -- Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
   req.body.user = req.user.id;
@@ -29,7 +29,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res) => {
 exports.getProdutcDetails = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler('Product not found', 404));
+    return next(new ErrorHandler("Product not found", 404));
   }
   res.status(200).json({
     succes: true,
@@ -43,7 +43,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
   if (!product) {
-    return next(new ErrorHandler('Product not found', 404));
+    return next(new ErrorHandler("Product not found", 404));
   }
   product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -61,12 +61,12 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
   if (!product) {
-    return next(new ErrorHandler('Product not found', 404));
+    return next(new ErrorHandler("Product not found", 404));
   }
   await product.remove();
   res.status(200).json({
     succes: true,
-    message: 'Product delete successfully',
+    message: "Product delete successfully",
   });
 });
 
@@ -106,6 +106,67 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
   product.ratings = avg / product.reviews.length;
 
   await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+  });
+});
+
+// Get All Reviews of a product
+exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.id);
+
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    reviews: product.reviews,
+  });
+});
+
+// Delete Review
+exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.productId);
+
+  if (!product) {
+    return next(new ErrorHander("Product not found", 404));
+  }
+
+  const reviews = product.reviews.filter(
+    (rev) => rev._id.toString() !== req.query.id.toString()
+  );
+
+  let avg = 0;
+
+  reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
+
+  let ratings = 0;
+
+  if (reviews.length === 0) {
+    ratings = 0;
+  } else {
+    ratings = avg / reviews.length;
+  }
+
+  const numOfReviews = reviews.length;
+
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    {
+      reviews,
+      ratings,
+      numOfReviews,
+    },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
 
   res.status(200).json({
     success: true,
