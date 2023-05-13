@@ -34,11 +34,11 @@ exports.getProdutcDetails = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     succes: true,
     product,
-    productCount,
+    // productCount,
   });
 });
 
-// update product
+// update product  --Admin
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
   let product = await Product.findById(req.params.id);
 
