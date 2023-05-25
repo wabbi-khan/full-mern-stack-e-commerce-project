@@ -1,15 +1,23 @@
-// import "./App.css";
-
-// function App() {
-//   return <div>ads</div>;
-// }
-
-// export default App;
-
 import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import webFont from "webfontloader";
+import Header from "./components/layout/Header/Header";
+import Footer from "./components/layout/Footer/Footer.jsx";
 
 const App = () => {
-  return <div>App</div>;
+  React.useEffect(() => {
+    webFont.load({
+      google: {
+        families: ["Roboto", "Droid Sans", "Chilanka"],
+      },
+    });
+  }, {});
+  return (
+    <Router>
+      <Header />
+      <Footer />
+    </Router>
+  );
 };
 
 export default App;
